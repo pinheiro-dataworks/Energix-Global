@@ -1,0 +1,10 @@
+# Ignorar tudo que não é o dashboard (site estático)
+scripts/
+dataset/
+docs/
+requirements.txt
+README.md
+*.py
+*.csv
+*.md
+*.pdf

@@ -1,4 +1,4 @@
-# ── Python ──────────────────────────────────────────
+# ── Python cache ─────────────────────────────────────
 __pycache__/
 *.py[cod]
 *.pyc
@@ -37,13 +37,12 @@ ehthumbs.db
 Thumbs.db
 desktop.ini
 
-# ── Vercel ───────────────────────────────────────────
+# ── Vercel local ─────────────────────────────────────
 .vercel/
 
-# ── Node (caso adicione ferramentas futuras) ──────────
+# ── Node ─────────────────────────────────────────────
 node_modules/
 npm-debug.log*
-yarn-debug.log*
 yarn-error.log*
 package-lock.json
 
@@ -51,6 +50,9 @@ package-lock.json
 .ipynb_checkpoints/
 *.ipynb
 
-# ── Outputs temporários ──────────────────────────────
+# ── Logs e temporários ───────────────────────────────
 *.log
 *.tmp
+
+# IMPORTANTE: data.json e arquivos do dashboard NÃO estão aqui
+# O arquivo dashboard/data/data.json DEVE ser versionado no Git

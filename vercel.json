@@ -1,6 +1,35 @@
 {
+  "version": 2,
+  "framework": null,
   "outputDirectory": "dashboard",
+  "buildCommand": "echo 'static site'",
+  "installCommand": "echo 'no install'",
+  "devCommand": "echo 'no dev'",
+  "ignoreCommand": "exit 1",
+  "cleanUrls": true,
+  "trailingSlash": false,
   "rewrites": [
-    { "source": "/(.*)", "destination": "/index.html" }
+    { "source": "/(.*)", "destination": "/$1" }
+  ],
+  "headers": [
+    {
+      "source": "/(.*)",
+      "headers": [
+        { "key": "Cache-Control", "value": "public, max-age=3600, must-revalidate" }
+      ]
+    },
+    {
+      "source": "/data/(.*)",
+      "headers": [
+        { "key": "Cache-Control", "value": "public, max-age=86400" },
+        { "key": "Content-Type", "value": "application/json; charset=utf-8" }
+      ]
+    },
+    {
+      "source": "/assets/(.*)",
+      "headers": [
+        { "key": "Cache-Control", "value": "public, max-age=604800, immutable" }
+      ]
+    }
   ]
 }
