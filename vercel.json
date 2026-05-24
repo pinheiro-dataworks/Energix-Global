@@ -1,9 +1,7 @@
 {
   "version": 2,
-  "buildCommand": "echo 'Static site — no build required'",
   "outputDirectory": "dashboard",
-  "installCommand": "echo 'No install required'",
-  "framework": null,
+  "buildCommand": null,
   "cleanUrls": true,
   "trailingSlash": false,
   "headers": [
