@@ -1,0 +1,419 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Energix Global — Inteligência em Energia Renovável</title>
+  <meta name="description" content="Dashboard de análise da participação de energias renováveis na geração elétrica mundial com clustering K-Means e Regressão Polinomial." />
+
+  <!-- Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;500;600;700;800&family=Roboto:wght@300;400;500&display=swap" rel="stylesheet" />
+
+  <!-- Stylesheet -->
+  <link rel="stylesheet" href="./css/style.css" />
+</head>
+<body>
+
+<!-- ═══════════════════════════════════════
+     FIXED HEADER
+══════════════════════════════════════════ -->
+<header id="main-header">
+  <div class="header-logo">
+    <img src="./assets/img/fig_logo.png" alt="Energix Global" />
+  </div>
+
+  <button class="btn-filtros" id="btn-filtros" aria-label="Abrir filtros">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+      <line x1="4" y1="6"  x2="20" y2="6"  />
+      <line x1="8" y1="12" x2="16" y2="12" />
+      <line x1="11" y1="18" x2="13" y2="18"/>
+    </svg>
+    Filtros
+  </button>
+
+  <!-- Filter Dropdown -->
+  <div class="filter-dropdown" id="filter-dropdown">
+    <div class="filter-header-row">
+      <span>Filtrar Dashboard</span>
+      <button class="btn-limpar" id="btn-limpar">Limpar tudo</button>
+    </div>
+
+    <div class="filter-group">
+      <div class="filter-group-title">Cluster</div>
+      <div class="filter-options" id="filter-clusters"></div>
+    </div>
+
+    <div class="filter-group">
+      <div class="filter-group-title">Continente</div>
+      <div class="filter-options" id="filter-continents"></div>
+    </div>
+
+    <div class="filter-group">
+      <div class="filter-group-title">Ano (ranking)</div>
+      <div class="filter-options" id="filter-years"></div>
+    </div>
+
+    <button class="btn-aplicar" id="btn-aplicar">Aplicar Filtros</button>
+  </div>
+</header>
+
+<!-- Active filters bar -->
+<div class="active-filters-bar" id="active-filters-bar"></div>
+
+<!-- ═══════════════════════════════════════
+     MAIN APP
+══════════════════════════════════════════ -->
+<div id="app">
+
+  <!-- Loading -->
+  <div id="loading" style="text-align:center;padding:80px 20px;color:#5A6A7A;">
+    <div style="font-family:Montserrat,sans-serif;font-size:18px;font-weight:600;margin-bottom:8px;">Carregando dados…</div>
+    <div style="font-size:13px;opacity:0.6;">Processando dataset de energia renovável global</div>
+  </div>
+
+  <!-- Dashboard (hidden until data loads) -->
+  <div id="dashboard" style="display:none">
+
+    <!-- ══════════════════════════════════
+         HERO
+    ════════════════════════════════════ -->
+    <section class="hero-section">
+      <div class="container">
+        <div class="hero-inner">
+
+          <div class="hero-text">
+            <h1>Inteligência Global em Energia Renovável</h1>
+            <p>Análise da participação de energias renováveis na geração elétrica mundial,<br>
+               com clustering K-Means e Regressão Polinomial para projeção 2030.</p>
+          </div>
+
+          <div class="hero-kpis">
+            <div class="kpi-card">
+              <div class="kpi-value green" id="kpi-renew">—</div>
+              <div class="kpi-label">renovável / eletricidade global 2025</div>
+            </div>
+            <div class="kpi-card">
+              <div class="kpi-value" id="kpi-countries">—</div>
+              <div class="kpi-label">países analisados</div>
+            </div>
+            <div class="kpi-card">
+              <div class="kpi-value" id="kpi-years">—</div>
+              <div class="kpi-label">anos de dados (2000–2025)</div>
+            </div>
+            <div class="kpi-card">
+              <div class="kpi-value green" id="kpi-growth">—</div>
+              <div class="kpi-label">crescimento renovável 2000–2025</div>
+            </div>
+          </div>
+
+        </div>
+      </div>
+    </section>
+
+    <!-- ══════════════════════════════════
+         INDICADORES GLOBAIS 2025
+    ════════════════════════════════════ -->
+    <div class="container">
+      <div class="section-wrap">
+        <h2 class="section-title">Indicadores Globais 2025</h2>
+
+        <div class="indicators-grid">
+
+          <!-- Renováveis -->
+          <div class="indicator-card">
+            <div class="indicator-icon green">
+              <img src="./assets/img/card_01.png" alt="" style="width:22px;height:22px;object-fit:contain;filter:hue-rotate(0deg)" onerror="this.textContent='🌿';this.style.fontSize='20px'" />
+            </div>
+            <div class="indicator-body">
+              <div class="indicator-value green" id="ind-renew-val">—</div>
+              <div class="indicator-label">energia de fonte elétrica</div>
+              <span class="indicator-delta up" id="ind-renew-delta">—</span>
+            </div>
+          </div>
+
+          <!-- Solar -->
+          <div class="indicator-card">
+            <div class="indicator-icon solar">
+              <img src="./assets/img/card_02.png" alt="" style="width:22px;height:22px;object-fit:contain" onerror="this.textContent='☀️';this.style.fontSize='20px'" />
+            </div>
+            <div class="indicator-body">
+              <div class="indicator-value solar" id="ind-solar-val">—</div>
+              <div class="indicator-label">energia de fonte solar</div>
+              <span class="indicator-delta up" id="ind-solar-delta">—</span>
+            </div>
+          </div>
+
+          <!-- Eólica -->
+          <div class="indicator-card">
+            <div class="indicator-icon wind">
+              <img src="./assets/img/card_03.png" alt="" style="width:22px;height:22px;object-fit:contain" onerror="this.textContent='💨';this.style.fontSize='20px'" />
+            </div>
+            <div class="indicator-body">
+              <div class="indicator-value wind" id="ind-wind-val">—</div>
+              <div class="indicator-label">energia de fonte eólica</div>
+              <span class="indicator-delta up" id="ind-wind-delta">—</span>
+            </div>
+          </div>
+
+          <!-- Fóssil -->
+          <div class="indicator-card">
+            <div class="indicator-icon fossil">
+              <img src="./assets/img/card_04.png" alt="" style="width:22px;height:22px;object-fit:contain" onerror="this.textContent='🔥';this.style.fontSize='20px'" />
+            </div>
+            <div class="indicator-body">
+              <div class="indicator-value fossil" id="ind-fossil-val">—</div>
+              <div class="indicator-label">energia de fonte fóssil</div>
+              <span class="indicator-delta down" id="ind-fossil-delta">—</span>
+            </div>
+          </div>
+
+        </div>
+      </div>
+    </div>
+
+    <!-- ══════════════════════════════════
+         TENDÊNCIA GLOBAL + PREVISÃO ML
+    ════════════════════════════════════ -->
+    <div class="container">
+      <div class="section-wrap">
+        <h2 class="section-title">Tendência Global 2000–2025 &amp; Previsão ML 2026–2030</h2>
+
+        <div class="trend-grid">
+
+          <!-- Linha do tempo -->
+          <div class="card">
+            <div class="card-title">Evolução global da matriz elétrica</div>
+            <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:8px;">
+              <div class="card-subtitle" style="margin-bottom:0">% participação na geração elétrica global</div>
+              <span id="r2-value" style="font-size:11.5px;font-weight:600;color:#E05252;font-family:Montserrat,sans-serif;background:#FDEAEA;padding:3px 9px;border-radius:12px">—</span>
+            </div>
+            <div class="chart-legend mb-12">
+              <div class="legend-item"><div class="legend-line" style="background:#3DBE6C"></div> Renováveis</div>
+              <div class="legend-item"><div class="legend-line" style="background:#E05252"></div> Fóssil</div>
+              <div class="legend-item"><div class="legend-line" style="background:#E05252;opacity:0.5;height:2px;border-top:2px dashed #E05252;background:none;width:18px"></div> Regressão Pol.</div>
+            </div>
+            <div class="chart-container" style="height:230px">
+              <canvas id="trendChart"></canvas>
+            </div>
+
+            <!-- Regression badge -->
+            <div class="regression-badge">
+              <div class="badge-icon">📈</div>
+              <div>
+                <h4>Regressão Polinomial de Grau 2</h4>
+                <p>O gráfico aplica Regressão Polinomial de Grau 2 (<span id="r2-inline">R²</span>) sobre 26 anos de dados históricos. Os coeficientes foram estimados via Mínimos Quadrados Ordinários, com PolynomialFeatures (degree=2) do scikit-learn.</p>
+              </div>
+            </div>
+          </div>
+
+          <!-- Donut + Tabela projeção -->
+          <div style="display:flex;flex-direction:column;gap:16px">
+
+            <div class="card">
+              <div class="card-title">Matriz elétrica global 2025</div>
+              <div class="chart-container" style="height:200px">
+                <canvas id="donutChart"></canvas>
+              </div>
+            </div>
+
+            <div class="card">
+              <div class="card-title">Projeção 2026–2030</div>
+              <table class="forecast-table mt-12">
+                <thead>
+                  <tr>
+                    <th>Ano</th>
+                    <th>Renováveis %</th>
+                    <th>Δ Anual</th>
+                  </tr>
+                </thead>
+                <tbody id="forecast-tbody"></tbody>
+              </table>
+            </div>
+
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ══════════════════════════════════
+         CRESCIMENTO FONTES EMERGENTES
+    ════════════════════════════════════ -->
+    <div class="container">
+      <div class="section-wrap">
+        <h2 class="section-title">Crescimento das Fontes Emergentes</h2>
+
+        <div class="two-col">
+
+          <div class="card">
+            <div class="card-title">Energia Solar — Participação Mundial</div>
+            <div class="card-subtitle">% da geração elétrica global — 2000 a 2025</div>
+            <div class="chart-container" style="height:200px">
+              <canvas id="solarChart"></canvas>
+            </div>
+          </div>
+
+          <div class="card">
+            <div class="card-title">Energia Eólica — Participação Mundial</div>
+            <div class="card-subtitle">% da geração elétrica global — 2000 a 2025</div>
+            <div class="chart-container" style="height:200px">
+              <canvas id="windChart"></canvas>
+            </div>
+          </div>
+
+        </div>
+      </div>
+    </div>
+
+    <!-- ══════════════════════════════════
+         ANÁLISE COMPARATIVA
+    ════════════════════════════════════ -->
+    <div class="container">
+      <div class="section-wrap">
+        <h2 class="section-title">Análise Comparativa por País</h2>
+
+        <div class="economies-ranking-grid">
+
+          <!-- Grandes economias + Brasil destaque -->
+          <div style="display:flex;flex-direction:column;gap:16px">
+            <div class="card">
+              <div class="card-title">Participação das grandes economias</div>
+              <div class="card-subtitle">Renováveis na eletricidade: Brasil, China, EUA, Alemanha, Índia e França</div>
+              <div class="chart-container" style="height:240px">
+                <canvas id="economiesChart"></canvas>
+              </div>
+            </div>
+
+            <!-- Brazil highlight -->
+            <div class="card" style="padding:16px 22px">
+              <div class="brazil-badge">
+                <div class="brazil-flag">
+                  <img src="./assets/img/fig_br.png" alt="Bandeira do Brasil" />
+                </div>
+                <div style="flex:1">
+                  <h4 style="font-family:Montserrat,sans-serif;font-size:13px;color:#2A9350;margin-bottom:8px">🇧🇷 Brasil — Destaque renovável</h4>
+                  <div style="font-size:11.5px;color:#3a7a50;margin-bottom:10px">Liderança histórica com matriz hidrelétrica dominante + crescimento acelerado de solar e eólica</div>
+                  <div class="brazil-stats">
+                    <div class="brazil-stat">
+                      <span class="val" id="br-renew">—</span>
+                      <span class="lbl">renováveis 2025</span>
+                    </div>
+                    <div class="brazil-stat">
+                      <span class="val" id="br-solar">—</span>
+                      <span class="lbl">solar 2025</span>
+                    </div>
+                    <div class="brazil-stat">
+                      <span class="val" id="br-wind">—</span>
+                      <span class="lbl">eólica 2025</span>
+                    </div>
+                    <div class="brazil-stat">
+                      <span class="val" id="br-hydro">—</span>
+                      <span class="lbl">hidro 2025</span>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Ranking -->
+          <div class="card">
+            <div class="card-title">Ranking — Renováveis 2024</div>
+            <div class="card-subtitle">Maior participação na geração elétrica · todos os 195 países</div>
+            <div class="ranking-container" id="ranking-list"></div>
+          </div>
+
+        </div>
+      </div>
+    </div>
+
+    <!-- ══════════════════════════════════
+         MACHINE LEARNING — K-MEANS
+    ════════════════════════════════════ -->
+    <div class="container">
+      <div class="section-wrap">
+        <h2 class="section-title">Machine Learning (K-Means Clustering)</h2>
+
+        <div class="kmeans-grid">
+
+          <!-- Scatter + Distribution -->
+          <div style="display:flex;flex-direction:column;gap:16px">
+
+            <div class="card">
+              <div class="card-title">Agrupamento por perfil energético</div>
+              <div class="card-subtitle">K-Means 5 clusters · Renováveis % vs Fóssil %</div>
+              <div class="chart-container" style="height:280px">
+                <canvas id="scatterChart"></canvas>
+              </div>
+            </div>
+
+            <div class="card">
+              <div class="card-title">Distribuição por cluster</div>
+              <div id="dist-bars" style="margin-top:8px"></div>
+            </div>
+
+          </div>
+
+          <!-- Cluster Profiles -->
+          <div class="card">
+            <div class="card-title">Perfis dos clusters energéticos</div>
+            <div class="card-subtitle">Características médias de cada grupo em % de eletricidade · K-Means 5Clusters</div>
+            <div class="cluster-profiles-grid mt-12" id="cluster-profiles-grid"></div>
+          </div>
+
+        </div>
+      </div>
+    </div>
+
+    <!-- ══════════════════════════════════
+         EVOLUÇÃO DA COMPOSIÇÃO
+    ════════════════════════════════════ -->
+    <div class="container">
+      <div class="section-wrap">
+        <h2 class="section-title">Evolução da Composição da Matriz Elétrica Global</h2>
+
+        <div class="two-col">
+
+          <div class="card">
+            <div class="card-title">Fontes de eletricidade</div>
+            <div class="card-subtitle">Visualização da transformação estrutural 2000–2025</div>
+            <div class="chart-container" style="height:240px">
+              <canvas id="compositionChart"></canvas>
+            </div>
+          </div>
+
+          <div class="card">
+            <div class="card-title">Ritmo de crescimento anual</div>
+            <div class="card-subtitle">Variação percentual ano a ano da participação renovável</div>
+            <div class="chart-container" style="height:240px">
+              <canvas id="growthChart"></canvas>
+            </div>
+          </div>
+
+        </div>
+      </div>
+    </div>
+
+    <!-- ══════════════════════════════════
+         FOOTER
+    ════════════════════════════════════ -->
+    <footer class="container">
+      <div class="dashboard-footer">
+        Developed Renan Pinheiro © 2026 Version 1.0.0 &nbsp;·&nbsp;
+        Fonte de dados: <a href="https://ourworldindata.org/energy" target="_blank" rel="noopener" style="color:var(--green);text-decoration:none">Our World in Data – Energy Dataset</a>
+      </div>
+    </footer>
+
+  </div><!-- /dashboard -->
+</div><!-- /app -->
+
+<!-- Chart.js CDN -->
+<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.min.js"
+        integrity="sha512-ZwR1/gSZM3ai6vCdI+LVF1zSq/5HznD3oD+sCoJrzXJ+yKrayarjdTcB1PxQtXHsMkWZBc4MoK9DEBJvGgBQ=="
+        crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+
+<!-- App JS -->
+<script src="./js/app.js"></script>
+</body>
+</html>
